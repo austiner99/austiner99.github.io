@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Austin Erickson | Human-Robot Collaborative Throwing</title>
-<meta name="description" content="Austin Erickson, PhD researcher in Mechanical Engineering at BYU's RaD Lab. Human-robot collaborative throwing, haptics, and dynamic manipulation.">
+<title>Austin Erickson | Mechanical Engineer &amp; Researcher</title>
+<meta name="description" content="Austin Erickson is a mechanical engineering PhD researcher at BYU's RaD Lab, working on robotics, haptics, and human-robot collaboration.">
 <meta name="theme-color" content="#0a0e17">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -15,9 +16,11 @@
 <a class="skip" href="#main">Skip to content</a>
 
 <header class="nav" id="nav">
-  <a class="logo" href="#top">AE<span>.</span></a>
+  <!-- Animated AE logo: plays on load and again on hover (see logo.js) -->
+  <a class="logo" id="logo" href="#top" aria-label="Austin Erickson, back to top"></a>
   <nav aria-label="Primary">
     <a href="#about">About</a>
+    <a href="#projects">Projects</a>
     <a href="#research">Research</a>
     <a href="#publications">Publications</a>
     <a href="#cv">CV</a>
@@ -28,20 +31,17 @@
 <main id="main">
 <!-- HERO -->
 <section class="hero" id="top">
-  <canvas id="throw-canvas" aria-hidden="true"></canvas>
   <div class="hero-inner">
-    <p class="eyebrow">PhD Researcher · Mechanical Engineering · BYU RaD Lab</p>
-    <h1>Teaching robots to <em>catch</em><br>what humans <em>throw.</em></h1>
-    <p class="lede">I'm Austin Erickson. I study how people coordinate when they throw to each other, and use it to build robots that can be real partners in dynamic, physical work, from disaster relief to flood barriers.</p>
+    <p class="eyebrow">Mechanical Engineer · Researcher · BYU</p>
+    <h1>Austin <em>Erickson</em></h1>
+    <blockquote class="philosophy">
+      <p>[philosophy here]</p>
+      <footer>My engineering philosophy</footer>
+    </blockquote>
     <div class="cta">
-      <a class="btn primary" href="#research">Explore research</a>
+      <a class="btn primary" href="#projects">See my work</a>
       <a class="btn ghost" href="#cv">View CV</a>
     </div>
-    <ul class="stats">
-      <li><b data-count="40">0</b><span>participants</span></li>
-      <li><b data-count="20">0</b><span>throwing dyads</span></li>
-      <li><b>1</b><span>paper under review at IEEE ToH</span></li>
-    </ul>
   </div>
   <a class="scroll-hint" href="#about" aria-label="Scroll to about">scroll ↓</a>
 </section>
@@ -55,23 +55,73 @@
     </div>
     <div class="reveal">
       <p class="eyebrow">About</p>
-      <h2>Where human motor science meets <em>applied robotics</em></h2>
-      <p>I'm a PhD student in Mechanical Engineering at Brigham Young University, working in the RaD Lab. My research asks a simple question with hard answers: when two people throw an object back and forth, what are they communicating to each other, and how can a robot learn to read and send those same signals?</p>
-      <p>That question sits between biomechanics, haptics, and dynamic manipulation. The long-term motivation is humanitarian: robots that can work alongside people to move heavy or hazardous material quickly, like sandbags for flood barriers or supplies in a disaster zone.</p>
+      <h2>Engineer, researcher, <em>builder</em></h2>
+      <p>I'm a PhD student in Mechanical Engineering at Brigham Young University, working in the RaD Lab. I like problems where careful measurement, good models, and real hardware all have to agree.</p>
+      <p>[Add two or three sentences here about what you care about as an engineer, the kind of team or problem you want to work on next, and anything that makes you memorable.]</p>
+
+      <h3 class="mini">What I bring</h3>
+      <div class="skills">
+        <div><b>Robotics</b><div class="tags"><span>Human-robot interaction</span><span>Dynamic manipulation</span><span>Haptics</span><span>State estimation</span></div></div>
+        <div><b>Analysis</b><div class="tags"><span>Experimental design</span><span>Motion capture data</span><span>Statistics</span><span>Python</span></div></div>
+        <div><b>Communication</b><div class="tags"><span>Technical writing</span><span>LaTeX / IEEE papers</span><span>Presenting research</span></div></div>
+      </div>
+
       <h3 class="mini">Off the clock</h3>
       <div class="tags">
-        <span>Hiking</span><span>Camping &amp; camp cooking</span><span>Throwing things (professionally)</span>
+        <span>Hiking</span><span>Camping &amp; camp cooking</span>
       </div>
-      <p class="note">Placeholder bio. Swap in your own voice and add anything you'd like a hiring manager to remember.</p>
+      <p class="note">Placeholder bio and skills. Edit freely, and swap in your own voice.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="section alt">
+  <div class="wrap">
+    <p class="eyebrow reveal">Projects</p>
+    <h2 class="reveal">Selected <em>work</em></h2>
+    <div class="cards">
+      <article class="card reveal">
+        <span class="num">01 · PhD research</span>
+        <h3>Human-robot collaborative throwing</h3>
+        <p>How do two people coordinate a throw and a catch, and how can a robot join in? A study of 20 throwing pairs, aimed at robots that work alongside people in disaster response.</p>
+        <div class="tags"><span>Robotics</span><span>Haptics</span><span>Biomechanics</span></div>
+        <a class="more" href="#research">Read more ↓</a>
+      </article>
+      <article class="card reveal placeholder">
+        <span class="num">02</span>
+        <h3>[Project title]</h3>
+        <p>[One or two sentences: the problem, what you built or did, and the result. Numbers are great.]</p>
+        <div class="tags"><span>[tools]</span><span>[skills]</span></div>
+      </article>
+      <article class="card reveal placeholder">
+        <span class="num">03</span>
+        <h3>[Project title]</h3>
+        <p>[Course project, internship, design team, side project. Anything that shows how you work.]</p>
+        <div class="tags"><span>[tools]</span><span>[skills]</span></div>
+      </article>
     </div>
   </div>
 </section>
 
 <!-- RESEARCH -->
-<section id="research" class="section alt">
+<section id="research" class="section">
   <div class="wrap">
     <p class="eyebrow reveal">Research</p>
-    <h2 class="reveal">Three threads, <em>one goal</em></h2>
+    <h2 class="reveal big-h">Teaching robots to <em>catch</em><br>what humans <em>throw.</em></h2>
+    <p class="lede reveal">I study how people coordinate when they throw to each other, and use it to build robots that can be real partners in dynamic, physical work, from disaster relief to flood barriers.</p>
+
+    <div class="throw-banner reveal">
+      <canvas id="throw-canvas" aria-label="Two stick figures throwing a ball back and forth"></canvas>
+    </div>
+
+    <ul class="stats reveal">
+      <li><b data-count="40">0</b><span>participants</span></li>
+      <li><b data-count="20">0</b><span>throwing dyads</span></li>
+      <li><b>1</b><span>paper under review at IEEE ToH</span></li>
+    </ul>
+
+    <h3 class="sub-h reveal">Three threads, <em>one goal</em></h3>
     <div class="cards">
       <article class="card reveal">
         <span class="num">01</span>
@@ -115,10 +165,10 @@
 </section>
 
 <!-- PUBLICATIONS -->
-<section id="publications" class="section">
+<section id="publications" class="section alt">
   <div class="wrap">
     <p class="eyebrow reveal">Publications</p>
-    <h2 class="reveal">Selected <em>work</em></h2>
+    <h2 class="reveal">Selected <em>papers</em></h2>
     <ul class="pubs">
       <li class="pub reveal">
         <span class="badge">Under review</span>
@@ -138,7 +188,7 @@
 </section>
 
 <!-- CV -->
-<section id="cv" class="section alt">
+<section id="cv" class="section">
   <div class="wrap narrow center reveal">
     <p class="eyebrow">CV</p>
     <h2>The <em>short version</em></h2>
@@ -152,11 +202,11 @@
 </section>
 
 <!-- CONTACT -->
-<section id="contact" class="section">
+<section id="contact" class="section alt">
   <div class="wrap narrow center reveal">
     <p class="eyebrow">Contact</p>
     <h2>Let's <em>talk</em></h2>
-    <p>Interested in collaborating, or want to hear more about the research? I'd love to hear from you.</p>
+    <p>Hiring, collaborating, or just curious about the work? I'd love to hear from you.</p>
     <a class="btn primary big" href="mailto:austiner@byu.edu">austiner@byu.edu</a>
     <ul class="socials">
       <li><a href="https://github.com/austiner99" rel="noopener">GitHub</a></li>
@@ -171,6 +221,7 @@
   <p>© <span id="yr">2026</span> Austin Erickson · Brigham Young University · <a href="#top">Back to top ↑</a></p>
 </footer>
 
+<script src="logo.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
