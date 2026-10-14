@@ -1,119 +1,134 @@
+/* AE logo: a big orange dot shrinks into place, then a dart draws the A and the line
+   while the A slides left and its right leg becomes the spine of the E.
+   Plays on load and again whenever the mouse (or a tap/keyboard focus) lands on it. */
 (function(){
+  const slot = document.getElementById('logo');
+  if(!slot) return;
+  const NS='http://www.w3.org/2000/svg';
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  document.getElementById('yr').textContent = new Date().getFullYear();
+  const W='#f1f5fb', B='#4cc9f0', O='#ff7a59', BLUE=[76,201,240], WHITE=[241,245,251];
+  const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+  const lerp=(a,b,k)=>a+(b-a)*k;
+  const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+  const mix=(a,b,k)=>`rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*k)).join(',')})`;
+  const mk=(tag,attrs,parent)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e};
 
-  // nav background on scroll
-  const nav = document.getElementById('nav');
-  const onScroll = () => nav.classList.toggle('scrolled', scrollY > 30);
-  addEventListener('scroll', onScroll, {passive:true}); onScroll();
+  // chosen settings
+  const S={angle:.65, flat:4, width:54};             // spine lean (fraction of the A's lean), flat top (px), E arm length (px)
+  const F={hold:24, fade:130};                        // blue trail behind the dart: solid, then fades to white
+  const colorAt=d=>mix(BLUE,WHITE,d<=F.hold?0:Math.min(1,(d-F.hold)/F.fade));
+  const T={tl:10,nx:-5,r:7,shape:`<polygon points="10,0 -9,-7 -5,-1.6 -5,1.6 -9,7" fill="${B}"/>`};
+  const LEG='M48,12 Q20,56 6,100', CURL='M6,100 C14,88 20,58 40,58';
+  const THETA_A=Math.atan(42/88);
 
-  // reveal on scroll
-  const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }), {threshold:.12});
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  // geometry
+  const Ta=48+S.flat, FRf=Ta+88*Math.tan(S.angle*THETA_A);
+  const c={Ta,FRf,xTend:Ta+S.width,xBend:FRf+S.width};
+  c.BX=(Ta+FRf)/2+S.width+10; c.shift=c.BX-91;
+  c.rest=c.BX-T.r-3-T.tl; c.endXw=c.rest+T.nx;
+  c.R0=(c.BX+12)/6; c.cx0=(c.BX+6)/2; c.ang=0;
 
-  // card glow follows cursor
-  document.querySelectorAll('.card').forEach(c => c.addEventListener('pointermove', e => {
-    const r = c.getBoundingClientRect();
-    c.style.setProperty('--mx', (e.clientX - r.left) + 'px');
-    c.style.setProperty('--my', (e.clientY - r.top) + 'px');
-  }));
-
-  // count-up stats
-  document.querySelectorAll('[data-count]').forEach(el => {
-    const end = +el.dataset.count; let n = 0;
-    const step = () => { n += Math.max(1, end/40); if(n >= end){ el.textContent = end; return; } el.textContent = Math.floor(n); requestAnimationFrame(step); };
-    reduce ? el.textContent = end : setTimeout(step, 400);
-  });
-
-  // HERO: two throwers tossing a ball back and forth along physics arcs
-  const cv = document.getElementById('throw-canvas'), cx = cv.getContext('2d');
-  let W, H, dpr, t0 = performance.now(), trail = [];
-  function size(){
-    dpr = Math.min(devicePixelRatio || 1, 2);
-    W = cv.clientWidth; H = cv.clientHeight;
-    cv.width = W*dpr; cv.height = H*dpr; cx.setTransform(dpr,0,0,dpr,0,0);
+  // path sampling (needs a hidden svg to measure in)
+  const meas=mk('svg',{width:0,height:0,style:'position:absolute;visibility:hidden','aria-hidden':'true'},document.body);
+  const cache={};
+  function sample(d){
+    if(cache[d]) return cache[d];
+    const p=mk('path',{d},meas), L=p.getTotalLength(), n=Math.max(6,Math.round(L/1.5)), pts=[];
+    for(let i=0;i<=n;i++){const q=p.getPointAtLength(L*i/n);pts.push([q.x,q.y])}
+    p.remove(); return cache[d]={L,n,pts};
   }
-  addEventListener('resize', size); size();
+  const segD=(sm,i)=>`M${sm.pts[i][0].toFixed(2)},${sm.pts[i][1].toFixed(2)} L${sm.pts[i+1][0].toFixed(2)},${sm.pts[i+1][1].toFixed(2)}`;
+  const at=(sm,s)=>{const f=clamp(s/sm.L)*sm.n,i=Math.min(sm.n-1,Math.floor(f)),k=f-i,a=sm.pts[i],b=sm.pts[i+1];return[a[0]+(b[0]-a[0])*k,a[1]+(b[1]-a[1])*k]};
 
-  const g = 1; // normalized
-  function draw(now){
-    const t = (now - t0)/1000;
-    cx.clearRect(0,0,W,H);
-    const ground = H*0.86, ax = W*0.62, bx = W*0.96, y0 = ground - 70;
-    const Tflight = 2.2; // seconds per throw
-    const phase = (t % (Tflight*2)); const dir = phase < Tflight ? 1 : -1;
-    const u = (dir === 1 ? phase : phase - Tflight)/Tflight; // 0..1
-    const sx = dir === 1 ? ax : bx, ex = dir === 1 ? bx : ax;
-    const peak = Math.min(H*0.38, 260);
-    const x = sx + (ex - sx)*u;
-    const y = y0 - 4*peak*u*(1-u);
+  // svg
+  const right=Math.max(c.BX+14,c.xBend+8);
+  const svg=mk('svg',{viewBox:`-8 0 ${right+8} 112`,role:'img','aria-label':'Austin Erickson, AE logo'});
+  svg.innerHTML=`<defs><radialGradient id="ae-glow"><stop offset="0" stop-color="${O}" stop-opacity=".65"/><stop offset="1" stop-color="${O}" stop-opacity="0"/></radialGradient></defs>
+  <g class="dyn" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"></g>
+  <circle class="glow" cx="${c.BX}" cy="58" r="18" fill="url(#ae-glow)" opacity="0"/>
+  <circle class="ball" cx="${c.BX}" cy="58" r="${T.r}" fill="${O}" opacity="0"/>
+  <g class="tri" opacity="0">${T.shape}</g>`;
+  slot.appendChild(svg);
+  const dyn=svg.querySelector('.dyn'), tri=svg.querySelector('.tri'), glow=svg.querySelector('.glow'), ball=svg.querySelector('.ball');
 
-    // ghost of ideal arcs
-    cx.lineWidth = 1.2; cx.setLineDash([4,8]);
-    cx.strokeStyle = 'rgba(76,201,240,.22)';
-    cx.beginPath();
-    for(let i=0;i<=60;i++){ const k=i/60; const px = ax+(bx-ax)*k, py = y0-4*peak*k*(1-k); i?cx.lineTo(px,py):cx.moveTo(px,py); }
-    cx.stroke(); cx.setLineDash([]);
+  // pieces
+  const legS=sample(LEG), curlS=sample(CURL), K=36, Nc=48;
+  const gA=mk('g',{},dyn);
+  const leg=[...Array(legS.n)].map((_,i)=>mk('path',{d:segD(legS,i),stroke:'transparent'},gA));
+  const curl=[...Array(curlS.n)].map((_,i)=>mk('path',{d:segD(curlS,i),stroke:'transparent'},gA));
+  const rl=[...Array(K)].map(()=>mk('path',{stroke:'transparent'},dyn));
+  const rlp=mk('path',{stroke:W,opacity:0},dyn);       // seamless spine once it has faded to white
+  const cross=[...Array(Nc)].map(()=>mk('path',{stroke:'transparent'},dyn));
+  const top=mk('path',{stroke:W,opacity:0},dyn), bot=mk('path',{stroke:W,opacity:0},dyn);
 
-    // stick-figure throwers
-    function figure(fx, facing, active){
-      cx.strokeStyle = active ? '#4cc9f0' : 'rgba(231,236,246,.55)';
-      cx.lineWidth = 3; cx.lineCap = 'round';
-      const hy = ground - 100;
-      cx.beginPath(); cx.arc(fx, hy-28, 12, 0, 7); cx.stroke();
-      cx.beginPath(); cx.moveTo(fx,hy-16); cx.lineTo(fx,hy+30); // torso
-      cx.moveTo(fx,hy+30); cx.lineTo(fx-14,ground); cx.moveTo(fx,hy+30); cx.lineTo(fx+14,ground); // legs
-      const swing = active ? Math.sin(u*Math.PI)*0.9 : 0;
-      const ang = -0.9 + (active ? -swing : 0.5);
-      cx.moveTo(fx,hy-6); cx.lineTo(fx + facing*34*Math.cos(ang+0.6), hy-6 + 34*Math.sin(ang+0.6)); // arm toward partner
-      cx.moveTo(fx,hy-6); cx.lineTo(fx - facing*20, hy+16);
-      cx.stroke();
-    }
-    figure(ax-6, 1, dir===1 && u<0.15);
-    figure(bx+6, -1, dir===-1 && u<0.15);
+  const TM={t0:1.35,dA:1.7,dL:1.5};
+  const tFoot=TM.t0+TM.dA, tLeave=tFoot+.06, tLand=tLeave+TM.dL, tEnd=tLand+.9;
+  const HID='transparent';
 
-    // ground
-    cx.strokeStyle = 'rgba(147,160,186,.25)'; cx.lineWidth = 1;
-    cx.beginPath(); cx.moveTo(W*0.5, ground); cx.lineTo(W, ground); cx.stroke();
+  function draw(t,smooth){
+    const u=clamp((t-tFoot)/(tLand-tFoot)), e=ease(u);          // everything morphs together, starting as the dart hits the foot
+    const s=c.shift*(1-e), Ta_=lerp(48,c.Ta,e), FR=lerp(90,c.FRf,e), Cx=lerp(76,(c.Ta+c.FRf)/2,e);
+    const P=[], cum=[0];
+    for(let i=0;i<=K;i++){const k=i/K,a=(1-k)*(1-k),b=2*(1-k)*k,d=k*k;
+      P.push([a*(s+FR)+b*(s+Cx)+d*(s+Ta_), a*100+b*56+d*12]);
+      if(i) cum.push(cum[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));}
+    const LR=cum[K], Ll=legS.L, Lc=curlS.L, xs=s+40, xe=c.endXw, cl=xe-xs;
+    const inA=t<tLeave;
+    const h=inA?ease(clamp((t-TM.t0)/TM.dA))*(LR+Ll):ease(clamp((t-tLeave)/TM.dL))*(Lc+cl);
+    const allWhite=!inA&&(h+Ll>=F.hold+F.fade);
+    rlp.setAttribute('d',`M${s+FR},100 Q${s+Cx},56 ${s+Ta_},12`); rlp.setAttribute('opacity',allWhite?1:0);
+    for(let i=0;i<K;i++){const r=(cum[i]+cum[i+1])/2,p=rl[i];
+      p.setAttribute('d',`M${P[i][0].toFixed(2)},${P[i][1].toFixed(2)} L${P[i+1][0].toFixed(2)},${P[i+1][1].toFixed(2)}`);
+      p.setAttribute('stroke',allWhite?HID:inA?(r<=h?colorAt(h-r):HID):colorAt(h+Ll+(LR-r)));}
+    gA.setAttribute('transform',`translate(${s},0)`);
+    leg.forEach((p,j)=>{const l=Ll*(j+.5)/legS.n;p.setAttribute('stroke',inA?(LR+l<=h?colorAt(h-LR-l):HID):colorAt(h+(Ll-l)))});
+    curl.forEach((p,j)=>{const sc=Lc*(j+.5)/curlS.n;p.setAttribute('stroke',inA?HID:(sc<=h?colorAt(h-sc):HID))});
+    cross.forEach((p,j)=>{const x0=xs+cl*j/Nc,x1=xs+cl*(j+1)/Nc,arc=Lc+((x0+x1)/2-xs);
+      p.setAttribute('d',`M${x0.toFixed(2)},58 L${x1.toFixed(2)},58`);p.setAttribute('stroke',inA?HID:(arc<=h?colorAt(h-arc):HID))});
+    const xT=lerp(s+Ta_,c.xTend,e), xB=lerp(s+FR,c.xBend,e);   // top and bottom arms grow with the dart
+    top.setAttribute('d',`M${s+48},12 L${xT},12`); top.setAttribute('opacity',u>.001?1:0);
+    bot.setAttribute('d',`M${s+FR},100 L${xB},100`); bot.setAttribute('opacity',u>.001?1:0);
 
-    // ball + trail
-    trail.push({x,y}); if(trail.length > 26) trail.shift();
-    trail.forEach((p,i) => { cx.fillStyle = `rgba(255,122,89,${i/trail.length*0.5})`; cx.beginPath(); cx.arc(p.x,p.y,2+i*0.12,0,7); cx.fill(); });
-    const grd = cx.createRadialGradient(x,y,0,x,y,26); grd.addColorStop(0,'rgba(255,122,89,.6)'); grd.addColorStop(1,'rgba(255,122,89,0)');
-    cx.fillStyle = grd; cx.beginPath(); cx.arc(x,y,26,0,7); cx.fill();
-    cx.fillStyle = '#ff7a59'; cx.beginPath(); cx.arc(x,y,7,0,7); cx.fill();
+    // dart position and heading
+    let pos,target;
+    const dir=(sm,a)=>{const p=at(sm,a-2),q=at(sm,a+2);return Math.atan2(q[1]-p[1],q[0]-p[0])};
+    if(inA){
+      if(h<=LR){let i=1;while(i<K&&cum[i]<h)i++;const k=(h-cum[i-1])/Math.max(.001,cum[i]-cum[i-1]);
+        pos=[lerp(P[i-1][0],P[i][0],k),lerp(P[i-1][1],P[i][1],k)];
+        const pa=P[Math.max(0,i-1)],pb=P[Math.min(K,i+1)];target=Math.atan2(pb[1]-pa[1],pb[0]-pa[0]);}
+      else{const l=h-LR,q=at(legS,l);pos=[q[0]+s,q[1]];target=dir(legS,l)}
+    } else if(h<=Lc){const q=at(curlS,h);pos=[q[0]+s,q[1]];target=dir(curlS,h)}
+    else{pos=[xs+(h-Lc),58];target=0}
+    if(!smooth) c.ang=(!inA&&h>Lc)?0:target;
+    else{let dd=target-c.ang;dd=Math.atan2(Math.sin(dd),Math.cos(dd));c.ang+=dd*.28;c.ang=Math.atan2(Math.sin(c.ang),Math.cos(c.ang));}
+    if(t>=tLand) c.ang*=.6;                                      // settles level, never spins
+    tri.setAttribute('transform',`translate(${pos[0]-Math.cos(c.ang)*T.nx},${pos[1]-Math.sin(c.ang)*T.nx}) rotate(${c.ang*180/Math.PI})`);
+    tri.setAttribute('opacity',t<TM.t0?0:1);
 
-    if(!reduce) requestAnimationFrame(draw);
+    // orange dot: pops in big, shrinks and glides to its place on the right
+    const m=ease(clamp((t-.6)/.8)), grow=1-Math.pow(1-clamp(t/.4),3);
+    const dr=t<.6?c.R0*grow:lerp(c.R0,T.r,m), dx=lerp(c.cx0,c.BX,m), op=clamp(t/.3);
+    for(const el of [glow,ball]){el.setAttribute('cx',dx);el.setAttribute('cy',58);el.setAttribute('opacity',op)}
+    ball.setAttribute('r',dr);
+    glow.setAttribute('r',dr*2.57+(t>tLand?14*Math.sin(clamp((t-tLand)/.6)*Math.PI):0));
   }
-  requestAnimationFrame(draw);
 
-  // SIM: projectile playground
-  const sc = document.getElementById('sim-canvas'), sx = sc.getContext('2d');
-  const v = document.getElementById('v'), a = document.getElementById('a');
-  const G = 9.81, h0 = 1.6; // release height (m)
-  function sim(){
-    const V = +v.value, A = +a.value*Math.PI/180;
-    document.getElementById('v-out').textContent = V.toFixed(1);
-    document.getElementById('a-out').textContent = a.value;
-    const vx = V*Math.cos(A), vy = V*Math.sin(A);
-    const T = (vy + Math.sqrt(vy*vy + 2*G*h0))/G;
-    const R = vx*T, P = h0 + vy*vy/(2*G);
-    document.getElementById('range-out').textContent = R.toFixed(1);
-    document.getElementById('peak-out').textContent = P.toFixed(1);
-    document.getElementById('t-out').textContent = T.toFixed(2);
-
-    const w = sc.width, h = sc.height, pad = 36;
-    const scale = Math.min((w-pad*2)/Math.max(R,12), (h-pad*2)/Math.max(P,4));
-    const X = m => pad + m*scale, Y = m => h - pad - m*scale;
-    sx.clearRect(0,0,w,h);
-    sx.strokeStyle = 'rgba(147,160,186,.18)'; sx.lineWidth = 1; sx.font = '11px JetBrains Mono, monospace'; sx.fillStyle = 'rgba(147,160,186,.7)';
-    for(let m=0; m<=Math.max(R,12); m+=2){ sx.beginPath(); sx.moveTo(X(m),pad/2); sx.lineTo(X(m),h-pad); sx.stroke(); if(m%4===0) sx.fillText(m+'m', X(m)-8, h-pad+16); }
-    sx.strokeStyle = 'rgba(147,160,186,.5)'; sx.beginPath(); sx.moveTo(pad,h-pad); sx.lineTo(w-pad/2,h-pad); sx.stroke();
-    sx.strokeStyle = '#4cc9f0'; sx.lineWidth = 2.5; sx.beginPath();
-    for(let i=0;i<=80;i++){ const t = T*i/80; const px = vx*t, py = h0 + vy*t - 0.5*G*t*t; i?sx.lineTo(X(px),Y(py)):sx.moveTo(X(px),Y(py)); }
-    sx.stroke();
-    sx.fillStyle = '#ff7a59'; sx.beginPath(); sx.arc(X(0),Y(h0),6,0,7); sx.fill();
-    sx.fillStyle = '#4cc9f0'; sx.beginPath(); sx.arc(X(R),Y(0),6,0,7); sx.fill();
+  let raf=0, playing=false;
+  function play(){
+    cancelAnimationFrame(raf); playing=true; c.ang=0;
+    const t0=performance.now();
+    (function frame(now){
+      const t=(now-t0)/1000; draw(t,true);
+      if(t<tEnd) raf=requestAnimationFrame(frame);
+      else{c.ang=0;draw(60,false);playing=false}
+    })(t0);
   }
-  v.addEventListener('input', sim); a.addEventListener('input', sim); sim();
+  draw(60,false);                                                // final state (also the no-motion version)
+  if(!reduce){
+    draw(0,false);                                               // start hidden, then play on load
+    requestAnimationFrame(()=>setTimeout(play,150));
+    const again=()=>{if(!playing) play()};
+    slot.addEventListener('pointerenter',again);
+    slot.addEventListener('focusin',again);
+  }
 })();
