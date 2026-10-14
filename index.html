@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Austin Erickson | Human-Robot Collaborative Throwing</title>
+<meta name="description" content="Austin Erickson, PhD researcher in Mechanical Engineering at BYU's RaD Lab. Human-robot collaborative throwing, haptics, and dynamic manipulation.">
+<meta name="theme-color" content="#0a0e17">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" id="nav">
+  <a class="logo" href="#top">AE<span>.</span></a>
+  <nav aria-label="Primary">
+    <a href="#about">About</a>
+    <a href="#research">Research</a>
+    <a href="#publications">Publications</a>
+    <a href="#cv">CV</a>
+    <a href="#contact" class="btn-mini">Contact</a>
+  </nav>
+</header>
+
+<main id="main">
+<!-- HERO -->
+<section class="hero" id="top">
+  <canvas id="throw-canvas" aria-hidden="true"></canvas>
+  <div class="hero-inner">
+    <p class="eyebrow">PhD Researcher · Mechanical Engineering · BYU RaD Lab</p>
+    <h1>Teaching robots to <em>catch</em><br>what humans <em>throw.</em></h1>
+    <p class="lede">I'm Austin Erickson. I study how people coordinate when they throw to each other, and use it to build robots that can be real partners in dynamic, physical work, from disaster relief to flood barriers.</p>
+    <div class="cta">
+      <a class="btn primary" href="#research">Explore research</a>
+      <a class="btn ghost" href="#cv">View CV</a>
+    </div>
+    <ul class="stats">
+      <li><b data-count="40">0</b><span>participants</span></li>
+      <li><b data-count="20">0</b><span>throwing dyads</span></li>
+      <li><b>1</b><span>paper under review at IEEE ToH</span></li>
+    </ul>
+  </div>
+  <a class="scroll-hint" href="#about" aria-label="Scroll to about">scroll ↓</a>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="section">
+  <div class="wrap grid-2">
+    <div class="photo reveal">
+      <!-- Replace with: <img src="assets/headshot.jpg" alt="Austin Erickson"> -->
+      <div class="photo-ph"><span>AE</span><small>headshot goes here<br>assets/headshot.jpg</small></div>
+    </div>
+    <div class="reveal">
+      <p class="eyebrow">About</p>
+      <h2>Where human motor science meets <em>applied robotics</em></h2>
+      <p>I'm a PhD student in Mechanical Engineering at Brigham Young University, working in the RaD Lab. My research asks a simple question with hard answers: when two people throw an object back and forth, what are they communicating to each other, and how can a robot learn to read and send those same signals?</p>
+      <p>That question sits between biomechanics, haptics, and dynamic manipulation. The long-term motivation is humanitarian: robots that can work alongside people to move heavy or hazardous material quickly, like sandbags for flood barriers or supplies in a disaster zone.</p>
+      <h3 class="mini">Off the clock</h3>
+      <div class="tags">
+        <span>Hiking</span><span>Camping &amp; camp cooking</span><span>Throwing things (professionally)</span>
+      </div>
+      <p class="note">Placeholder bio. Swap in your own voice and add anything you'd like a hiring manager to remember.</p>
+    </div>
+  </div>
+</section>
+
+<!-- RESEARCH -->
+<section id="research" class="section alt">
+  <div class="wrap">
+    <p class="eyebrow reveal">Research</p>
+    <h2 class="reveal">Three threads, <em>one goal</em></h2>
+    <div class="cards">
+      <article class="card reveal">
+        <span class="num">01</span>
+        <h3>Dyadic throwing biomechanics</h3>
+        <p>How do two people coordinate a throw and a catch? Motion capture of 20 dyads reveals the strategies partners use, including how the pre-release swing acts as a signal to the catcher.</p>
+        <div class="tags"><span>Motion capture</span><span>Statistics</span><span>Python</span></div>
+      </article>
+      <article class="card reveal">
+        <span class="num">02</span>
+        <h3>Haptic human-robot collaboration</h3>
+        <p>Motion cues can be felt as well as seen. I explore how haptic channels let a robot infer a human partner's intent and respond in sync, supporting shared control and cooperative manipulation.</p>
+        <div class="tags"><span>Haptics</span><span>Intent recognition</span><span>Shared control</span></div>
+      </article>
+      <article class="card reveal">
+        <span class="num">03</span>
+        <h3>Dynamic manipulation for humanitarian robotics</h3>
+        <p>Throwing is a fast way to move objects farther than an arm can reach. I'm working toward robots that throw and catch with people for disaster relief, flood response, and other time-critical tasks.</p>
+        <div class="tags"><span>Robotics</span><span>Trajectory planning</span><span>Disaster relief</span></div>
+      </article>
+    </div>
+
+    <div class="sim reveal">
+      <div class="sim-head">
+        <h3>Try it: the physics of a throw</h3>
+        <p>Adjust release speed and angle. The trace shows the ideal projectile path, the kind of physics-derived optimum I compare real throws against.</p>
+      </div>
+      <div class="sim-body">
+        <canvas id="sim-canvas" width="720" height="260" aria-label="Projectile trajectory simulator"></canvas>
+        <div class="sliders">
+          <label>Release speed <output id="v-out">9.0</output> m/s
+            <input id="v" type="range" min="4" max="16" step="0.1" value="9">
+          </label>
+          <label>Release angle <output id="a-out">40</output>°
+            <input id="a" type="range" min="10" max="80" step="1" value="40">
+          </label>
+          <p class="readout">Range <b id="range-out">0</b> m · Peak <b id="peak-out">0</b> m · Flight <b id="t-out">0</b> s</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PUBLICATIONS -->
+<section id="publications" class="section">
+  <div class="wrap">
+    <p class="eyebrow reveal">Publications</p>
+    <h2 class="reveal">Selected <em>work</em></h2>
+    <ul class="pubs">
+      <li class="pub reveal">
+        <span class="badge">Under review</span>
+        <h3>Human Coordination Strategies During Dyadic Throwing: Implications for Haptic Human-Robot Collaboration</h3>
+        <p class="authors"><b>A. Erickson</b>, J. Salmon, M. Killpack</p>
+        <p class="venue">IEEE Transactions on Haptics (submitted)</p>
+        <p>Examines how throwing partners coordinate, and argues that pre-release swing motion serves as a haptic communication channel. Funded in part by NASA Utah Space Grant.</p>
+        <div class="links"><a href="#" aria-disabled="true">PDF (soon)</a><a href="#" aria-disabled="true">Video (soon)</a></div>
+      </li>
+      <li class="pub reveal placeholder">
+        <span class="badge ghost">Coming soon</span>
+        <h3>Your next paper here</h3>
+        <p class="venue">Add conference papers, posters, and theses as they land.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- CV -->
+<section id="cv" class="section alt">
+  <div class="wrap narrow center reveal">
+    <p class="eyebrow">CV</p>
+    <h2>The <em>short version</em></h2>
+    <ul class="timeline">
+      <li><b>PhD, Mechanical Engineering</b><span>Brigham Young University · RaD Lab · in progress</span></li>
+      <li><b>Graduate Researcher</b><span>Human-robot collaborative throwing</span></li>
+    </ul>
+    <a class="btn primary" href="assets/Austin_Erickson_CV.pdf" download>Download full CV (PDF)</a>
+    <p class="note">Drop your PDF at <code>assets/Austin_Erickson_CV.pdf</code> and this button will work.</p>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="section">
+  <div class="wrap narrow center reveal">
+    <p class="eyebrow">Contact</p>
+    <h2>Let's <em>talk</em></h2>
+    <p>Interested in collaborating, or want to hear more about the research? I'd love to hear from you.</p>
+    <a class="btn primary big" href="mailto:austiner@byu.edu">austiner@byu.edu</a>
+    <ul class="socials">
+      <li><a href="https://github.com/austiner99" rel="noopener">GitHub</a></li>
+      <li><a href="https://www.linkedin.com/in/YOUR-LINKEDIN/" rel="noopener">LinkedIn</a></li>
+      <li><a href="https://scholar.google.com/" rel="noopener">Google Scholar</a></li>
+    </ul>
+  </div>
+</section>
+</main>
+
+<footer>
+  <p>© <span id="yr">2026</span> Austin Erickson · Brigham Young University · <a href="#top">Back to top ↑</a></p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
