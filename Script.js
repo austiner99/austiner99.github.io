@@ -1,6 +1,7 @@
 (function(){
+  document.documentElement.classList.add('js');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  document.getElementById('yr').textContent = new Date().getFullYear();
+  const yr = document.getElementById('yr'); if(yr) yr.textContent = new Date().getFullYear();
 
   // nav background on scroll
   const nav = document.getElementById('nav');
@@ -8,8 +9,13 @@
   addEventListener('scroll', onScroll, {passive:true}); onScroll();
 
   // reveal on scroll
-  const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }), {threshold:.12});
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  const reveals = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }), {threshold:.05});
+    reveals.forEach(el => io.observe(el));
+  } else reveals.forEach(el => el.classList.add('in'));
+  // safety net: never leave content hidden
+  setTimeout(() => reveals.forEach(el => el.classList.add('in')), 3500);
 
   // card glow follows cursor
   document.querySelectorAll('.card').forEach(c => c.addEventListener('pointermove', e => {
