@@ -4,6 +4,7 @@
 (function(){
   const slot = document.getElementById('logo');
   if(!slot) return;
+  function init(){
   const NS='http://www.w3.org/2000/svg';
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const W='#f1f5fb', B='#4cc9f0', O='#ff7a59', BLUE=[76,201,240], WHITE=[241,245,251];
@@ -29,11 +30,11 @@
   c.R0=(c.BX+12)/6; c.cx0=(c.BX+6)/2; c.ang=0;
 
   // path sampling (needs a hidden svg to measure in)
-  const meas=mk('svg',{width:0,height:0,style:'position:absolute;visibility:hidden','aria-hidden':'true'},document.body);
+  const meas=mk('svg',{width:10,height:10,style:'position:absolute;left:-9999px;top:0;opacity:0;pointer-events:none','aria-hidden':'true'},document.body);
   const cache={};
   function sample(d){
     if(cache[d]) return cache[d];
-    const p=mk('path',{d},meas), L=p.getTotalLength(), n=Math.max(6,Math.round(L/1.5)), pts=[];
+    const p=mk('path',{d},meas), L=p.getTotalLength(); if(!(L>0)) throw new Error('path measure failed'); const n=Math.max(6,Math.round(L/1.5)), pts=[];
     for(let i=0;i<=n;i++){const q=p.getPointAtLength(L*i/n);pts.push([q.x,q.y])}
     p.remove(); return cache[d]={L,n,pts};
   }
@@ -48,7 +49,6 @@
   <circle class="glow" cx="${c.BX}" cy="58" r="18" fill="url(#ae-glow)" opacity="0"/>
   <circle class="ball" cx="${c.BX}" cy="58" r="${T.r}" fill="${O}" opacity="0"/>
   <g class="tri" opacity="0">${T.shape}</g>`;
-  slot.appendChild(svg);
   const dyn=svg.querySelector('.dyn'), tri=svg.querySelector('.tri'), glow=svg.querySelector('.glow'), ball=svg.querySelector('.ball');
 
   // pieces
@@ -124,6 +124,7 @@
     })(t0);
   }
   draw(60,false);                                                // final state (also the no-motion version)
+  const fallback=slot.querySelector('img'); slot.appendChild(svg); if(fallback) fallback.remove();
   if(!reduce){
     draw(0,false);                                               // start hidden, then play on load
     requestAnimationFrame(()=>setTimeout(play,150));
@@ -131,4 +132,6 @@
     slot.addEventListener('pointerenter',again);
     slot.addEventListener('focusin',again);
   }
+  }
+  try{ init(); }catch(err){ console.warn('logo animation unavailable, using static logo',err); }
 })();

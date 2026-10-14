@@ -4,6 +4,7 @@ Static site, no build step. Files to upload to the root of the `austiner99.githu
 
 - index.html, style.css, script.js
 - logo.js  (the animated AE logo: plays on load and on hover)
+- logo-static.svg  (static logo shown if the animation cannot run)
 - favicon.svg  (browser tab icon)
 - .nojekyll (optional)
 

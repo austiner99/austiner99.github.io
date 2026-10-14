@@ -14,7 +14,7 @@ em{font-style:italic;color:var(--accent);font-family:'Space Grotesk',sans-serif}
 /* nav */
 .nav{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:14px 5vw;transition:.3s}
 .nav.scrolled{background:rgba(10,14,23,.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-.logo{display:block;line-height:0}.logo svg{display:block;height:46px;width:auto;overflow:visible}
+.logo{display:block;line-height:0;--ar:1.349}.logo svg,.logo img{display:block;height:46px;width:calc(46px * var(--ar))}.logo svg{overflow:visible}
 .nav nav{display:flex;gap:26px;align-items:center;font-size:15px;color:var(--muted)}
 .nav nav a:hover{color:var(--text)}
 .btn-mini{border:1px solid var(--accent);color:var(--accent)!important;padding:6px 16px;border-radius:99px}
@@ -143,6 +143,6 @@ footer a:hover{color:var(--accent)}
 .throw-banner #throw-canvas{position:absolute;inset:0;width:100%;height:100%}
 #research .stats{margin-bottom:60px}
 .sub-h{font:700 clamp(22px,2.6vw,30px) 'Space Grotesk';letter-spacing:-.02em;margin-bottom:24px}
-@media (max-width:820px){.throw-banner #throw-canvas,#throw-canvas{opacity:1}.throw-banner{height:240px}.logo svg{height:40px}.hero::after{display:none}}
+@media (max-width:820px){.throw-banner #throw-canvas,#throw-canvas{opacity:1}.throw-banner{height:240px}.logo svg,.logo img{height:40px;width:calc(40px * var(--ar))}.hero::after{display:none}}
 
 .hero-inner{z-index:1}
