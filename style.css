@@ -127,7 +127,8 @@ footer a:hover{color:var(--accent)}
   -webkit-mask-image:radial-gradient(420px circle at var(--hx,70%) var(--hy,35%),#000,transparent 70%);mask-image:radial-gradient(420px circle at var(--hx,70%) var(--hy,35%),#000,transparent 70%);pointer-events:none}
 .hero::after{content:"";position:absolute;width:520px;height:520px;left:calc(var(--hx,70%) - 260px);top:calc(var(--hy,35%) - 260px);background:radial-gradient(circle,rgba(76,201,240,.13),transparent 65%);pointer-events:none;transition:left .25s,top .25s}
 .hero h1{font-size:clamp(52px,10vw,120px);line-height:.98;margin-bottom:18px}
-.tagline{font:500 clamp(20px,3vw,32px)/1.25 'Space Grotesk';color:var(--accent);letter-spacing:-.01em;margin:0 0 30px}
+.tagline{display:inline-block;font:700 clamp(28px,4.6vw,52px)/1.12 'Space Grotesk';letter-spacing:-.025em;margin:0 0 32px;padding-bottom:4px;background:linear-gradient(90deg,var(--accent) 0%,#f1f5fb 40%,var(--accent2) 75%,var(--accent) 100%);background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:tagshine 8s linear infinite;filter:drop-shadow(0 0 22px rgba(76,201,240,.28))}
+@keyframes tagshine{to{background-position:220% center}}
 .philosophy{border-left:3px solid var(--accent2);padding:4px 0 4px 22px;margin:0 0 38px;max-width:680px}
 .philosophy p{font:500 clamp(20px,2.4vw,28px)/1.35 'Space Grotesk';color:var(--text);font-style:italic}
 .philosophy footer{font:500 12px 'JetBrains Mono';letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:10px;border:0;padding:0;text-align:left}
